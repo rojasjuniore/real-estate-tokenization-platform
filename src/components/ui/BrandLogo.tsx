@@ -1,5 +1,4 @@
 import { brandConfig } from '@/config/brand.config';
-import { BuildingTokLogo } from '@/components/icons/BuildingTokLogo';
 
 interface BrandLogoProps {
   width?: number;
@@ -11,7 +10,7 @@ interface BrandLogoProps {
 /**
  * Brand-aware logo component.
  * If NEXT_PUBLIC_CUSTOM_LOGO_URL is set, renders a custom <img>.
- * Otherwise falls back to the original BuildingTok SVG logo.
+ * Otherwise renders the app name as styled text.
  */
 export function BrandLogo({
   width = 180,
@@ -39,12 +38,14 @@ export function BrandLogo({
     );
   }
 
+  const textColor = variant === 'dark' ? 'text-white' : 'text-primary-700';
+
   return (
-    <BuildingTokLogo
-      width={width}
-      height={height}
-      variant={variant}
-      className={className}
-    />
+    <span
+      className={`font-bold tracking-tight ${textColor} ${className}`}
+      style={{ fontSize: Math.max(16, Math.round(width / 8)) }}
+    >
+      {brandConfig.identity.appName}
+    </span>
   );
 }
