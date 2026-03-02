@@ -1,0 +1,86 @@
+services:
+  # ================================
+  # PostgreSQL Database
+  # ================================
+  db:
+    image: postgres:16-alpine
+    container_name: buidingtok-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-buidingtok}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-buidingtok_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-buidingtok}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-buidingtok} -d ${POSTGRES_DB:-buidingtok}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - buidingtok-network
+
+  # ================================
+  # Next.js Application
+  # ================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: buidingtok-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-buidingtok}:${POSTGRES_PASSWORD:-buidingtok_secret}@db:5432/${POSTGRES_DB:-buidingtok}?schema=public
+
+      # App
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-BuidingTok}
+
+      # Blockchain
+      NEXT_PUBLIC_CHAIN_ID: ${NEXT_PUBLIC_CHAIN_ID:-137}
+      NEXT_PUBLIC_RPC_URL: ${NEXT_PUBLIC_RPC_URL}
+
+      # Contract Addresses
+      NEXT_PUBLIC_PROPERTY_TOKEN_ADDRESS: ${NEXT_PUBLIC_PROPERTY_TOKEN_ADDRESS}
+      NEXT_PUBLIC_PROPERTY_MARKETPLACE_ADDRESS: ${NEXT_PUBLIC_PROPERTY_MARKETPLACE_ADDRESS}
+      NEXT_PUBLIC_ROYALTY_DISTRIBUTOR_ADDRESS: ${NEXT_PUBLIC_ROYALTY_DISTRIBUTOR_ADDRESS}
+      NEXT_PUBLIC_PAYMENT_PROCESSOR_ADDRESS: ${NEXT_PUBLIC_PAYMENT_PROCESSOR_ADDRESS}
+
+      # Token Addresses
+      NEXT_PUBLIC_USDT_ADDRESS: ${NEXT_PUBLIC_USDT_ADDRESS:-0xc2132D05D31c914a87C6611C10748AEb04B58e8F}
+      NEXT_PUBLIC_USDC_ADDRESS: ${NEXT_PUBLIC_USDC_ADDRESS:-0x3c499c542cef5e3811e1192ce70d8cc03d5c3359}
+
+      # Web3Auth
+      NEXT_PUBLIC_WEB3AUTH_CLIENT_ID: ${NEXT_PUBLIC_WEB3AUTH_CLIENT_ID}
+      WEB3AUTH_SECRET: ${WEB3AUTH_SECRET}
+
+      # IPFS
+      PINATA_API_KEY: ${PINATA_API_KEY}
+      PINATA_SECRET_KEY: ${PINATA_SECRET_KEY}
+      NEXT_PUBLIC_IPFS_GATEWAY: ${NEXT_PUBLIC_IPFS_GATEWAY:-https://gateway.pinata.cloud/ipfs/}
+
+      # Auth
+      JWT_SECRET: ${JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+
+      # Admin
+      ADMIN_WALLET_ADDRESSES: ${ADMIN_WALLET_ADDRESSES}
+      NEXT_PUBLIC_ADMIN_WALLET_ADDRESSES: ${NEXT_PUBLIC_ADMIN_WALLET_ADDRESSES}
+      TREASURY_WALLET_ADDRESS: ${TREASURY_WALLET_ADDRESS}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - buidingtok-network
+
+volumes:
+  postgres_data:
+
+networks:
+  buidingtok-network:
+    driver: bridge

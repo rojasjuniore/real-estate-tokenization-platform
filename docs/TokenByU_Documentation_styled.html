@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>TokenByU - Documentación Completa</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.6; padding: 40px; max-width: 900px; margin: 0 auto; }
+    h1 { color: #1a1a1a; border-bottom: 2px solid #ddd; padding-bottom: 10px; page-break-after: avoid; }
+    h2 { color: #333; margin-top: 40px; page-break-after: avoid; }
+    h3 { color: #444; page-break-after: avoid; }
+    pre { background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px; }
+    code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+    pre code { background: none; padding: 0; }
+    table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+    th { background: #f6f8fa; }
+    tr:nth-child(even) { background: #fafafa; }
+    li { margin: 5px 0; }
+    @media print { body { padding: 20px; } }
+  </style>
+</head>
+<body>
+<p><div style="page-break-after: always;"></div></p><p><h1>TokenByU - Documentación Completa</h1></p><p><strong>Sistema de Tokenización de Bienes Raíces en Blockchain</strong></p><p><strong>Versión:</strong> 0.1.0 (Beta)
+<strong>Fecha:</strong> Diciembre 2024
+<strong>Estado:</strong> Producción en Polygon Mainnet</p><p>---</p><p></p><p><div style="page-break-after: always;"></div></p><p><h1>1. README - Índice de Documentación</h1></p><p><h2>Resumen del Sistema</h2></p><p>TokenByU es una plataforma de tokenización de bienes raíces construida sobre Polygon blockchain. Permite la inversión fraccionada en propiedades inmobiliarias mediante tokens ERC1155, con un marketplace P2P y distribución automatizada de dividendos.</p><p><h3>Arquitectura de Smart Contracts</h3></p><p><pre><code class="">┌─────────────────────┐     ┌──────────────────────┐
+│   PropertyToken     │     │  PropertyMarketplace │
+│   (ERC-1155)        │────►│   (P2P Trading)      │
+│                     │     │                      │
+│ • Crear propiedades │     │ • Crear listings     │
+│ • Transferir tokens │     │ • Comprar tokens     │
+│ • Quemar tokens     │     │ • Cancelar listings  │
+└──────────┬──────────┘     └──────────┬───────────┘
+           │                           │
+           ▼                           ▼
+┌─────────────────────┐     ┌──────────────────────┐
+│ RoyaltyDistributor  │     │  PaymentProcessor    │
+│   (Dividendos)      │     │    (Pagos)           │
+│                     │     │                      │
+│ • Crear distribución│     │ • Procesar pagos     │
+│ • Reclamar royalty  │     │ • Multi-token        │
+│ • Snapshot holders  │     │ • Comisiones         │
+└─────────────────────┘     └──────────────────────┘
+</code></pre></p><p><h3>Direcciones de Contratos (Polygon Mainnet)</h3></p><p><tr><td>Contrato</td><td>Dirección</td></tr></p><p><tr><td>PropertyToken</td><td><code>0x1F3b6d4E1dbb471017dbcE4A6206E03E0674C4D0</code></td></tr>
+<tr><td>PropertyMarketplace</td><td><code>0x205969FB45AC1992Ca1c99839e57297EF4C057d6</code></td></tr>
+<tr><td>RoyaltyDistributor</td><td><code>0xc07A968973fBe928bD47c59F837397001C2374cE</code></td></tr>
+<tr><td>PaymentProcessor</td><td><code>0xE2828aB33e2649Bd546BcFdfBB11131102Df7A0F</code></td></tr></p><p><h3>Stack Tecnológico</h3></p><p><tr><td>Capa</td><td>Tecnología</td></tr></p><p><tr><td>Frontend</td><td>Next.js 15, React 18, TypeScript, TailwindCSS, Zustand</td></tr>
+<tr><td>Backend</td><td>API Routes, Prisma ORM, PostgreSQL</td></tr>
+<tr><td>Blockchain</td><td>Polygon Mainnet, Solidity 0.8.20, ERC-1155, OpenZeppelin</td></tr>
+<tr><td>Auth</td><td>Web3Auth</td></tr></p><p><h3>Tokens de Pago Soportados</h3></p><p><tr><td>Token</td><td>Dirección</td><td>Decimales</td></tr></p><p><tr><td>USDT</td><td><code>0xc2132D05D31c914a87C6611C10748AEb04B58e8F</code></td><td>6</td></tr>
+<tr><td>USDC</td><td><code>0x3c499c542cef5e3811e1192ce70d8cc03d5c3359</code></td><td>6</td></tr>
+<tr><td>MATIC</td><td>Nativo</td><td>18</td></tr></p><p><h3>Quick Start para Desarrolladores</h3></p><p><pre><code class="bash"><h1>Clonar repositorio</h1>
+git clone https://github.com/rojasjuniore/APP_BUILDING_TOK.git
+cd APP_BUILDING_TOK</p><p><h1>Instalar dependencias</h1>
+npm install</p><p><h1>Configurar variables de entorno</h1>
+cp .env.example .env</p><p><h1>Generar cliente Prisma</h1>
+npx prisma generate</p><p><h1>Aplicar schema a DB</h1>
+npx prisma db push</p><p><h1>Iniciar desarrollo</h1>
+npm run dev
+</code></pre></p><p><h3>Estructura del Proyecto</h3></p><p><pre><code class="">Tokenbyu/
+├── contracts/              # Smart Contracts Solidity
+│   ├── tokens/                 # PropertyToken (ERC-1155)
+│   ├── marketplace/            # PropertyMarketplace
+│   ├── royalties/              # RoyaltyDistributor
+│   └── payments/               # PaymentProcessor
+│
+├── src/
+│   ├── app/                # Next.js App Router
+│   │   ├── api/                # API Routes
+│   │   └── admin/              # Panel administración
+│   ├── components/         # Componentes React
+│   ├── hooks/              # Custom Hooks
+│   ├── lib/                # Utilidades y configuración
+│   ├── store/              # Zustand stores
+│   └── types/              # TypeScript types
+│
+├── prisma/
+│   └── schema.prisma       # Schema de base de datos
+│
+├── docs/                   # Documentación
+└── test/                   # Tests
+</code></pre></p><p><div style="page-break-after: always;"></div></p><p><h1>2. Arquitectura del Sistema</h1></p><p><h2>2.1 Arquitectura de Alto Nivel</h2></p><p><pre><code class="">┌─────────────────────────────────────────────────────────────────────────────┐
+│                              CLIENTE (Browser)                               │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
+│  │   Next.js    │  │    Wagmi     │  │  Web3Auth    │  │   Zustand    │    │
+│  │   React 19   │  │   + Viem     │  │   (Social)   │  │   (State)    │    │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  └──────────────┘    │
+└─────────┼─────────────────┼─────────────────┼───────────────────────────────┘
+          │                 │                 │
+          │    HTTP/REST    │   JSON-RPC      │   OAuth 2.0
+          ▼                 ▼                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           BACKEND (Next.js API)                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
+│  │  API Routes  │  │  Services    │  │  JWT Auth    │  │  Middleware  │    │
+│  │  (51 total)  │  │  (Business)  │  │  (7 days)    │  │  (Validate)  │    │
+│  └──────┬───────┘  └──────────────┘  └──────────────┘  └──────────────┘    │
+└─────────┼───────────────────────────────────────────────────────────────────┘
+          │
+          │    Prisma ORM
+          ▼
+┌─────────────────────┐     ┌─────────────────────────────────────────────────┐
+│    PostgreSQL       │     │              POLYGON BLOCKCHAIN                  │
+│  ┌───────────────┐  │     │  ┌──────────────┐  ┌──────────────────────────┐│
+│  │ 12 Modelos    │  │     │  │PropertyToken │  │PropertyMarketplace       ││
+│  │ - User        │  │     │  │  (ERC1155)   │  │  (P2P Trading)           ││
+│  │ - Property    │  │     │  └──────────────┘  └──────────────────────────┘│
+│  │ - Listing     │  │     │  ┌──────────────┐  ┌──────────────────────────┐│
+│  │ - Portfolio   │  │     │  │RoyaltyDist.  │  │PaymentProcessor          ││
+│  │ - Dividend    │  │     │  │  (Dividends) │  │  (USDC/USDT/MATIC)       ││
+│  │ - KYC         │  │     │  └──────────────┘  └──────────────────────────┘│
+│  │ - Transaction │  │     └─────────────────────────────────────────────────┘
+│  └───────────────┘  │
+└─────────────────────┘</p><p>┌─────────────────────────────────────────────────────────────────────────────┐
+│                         SERVICIOS EXTERNOS                                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
+│  │  Cloudinary  │  │   Alchemy    │  │   Pinata     │  │  Web3Auth    │    │
+│  │  (Imágenes)  │  │  (RPC/Index) │  │   (IPFS)     │  │  (OAuth)     │    │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘    │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre></p><p><h2>2.2 Stack Tecnológico</h2></p><p><tr><td>Capa</td><td>Tecnología</td><td>Versión</td><td>Propósito</td></tr></p><p><tr><td><strong>Frontend</strong></td><td>Next.js</td><td>15.x</td><td>Framework React con SSR</td></tr>
+<tr><td>React</td><td>19.x</td><td>Librería UI</td></tr>
+<tr><td>Wagmi</td><td>3.1.x</td><td>Hooks Web3</td></tr>
+<tr><td>Zustand</td><td>5.x</td><td>State management</td></tr>
+<tr><td>TailwindCSS</td><td>3.x</td><td>Estilos</td></tr>
+<tr><td><strong>Backend</strong></td><td>Next.js API Routes</td><td>15.x</td><td>REST API</td></tr>
+<tr><td>Prisma</td><td>6.19.x</td><td>ORM</td></tr>
+<tr><td>Jose</td><td>5.x</td><td>JWT tokens</td></tr>
+<tr><td><strong>Database</strong></td><td>PostgreSQL</td><td>15+</td><td>Base de datos principal</td></tr>
+<tr><td><strong>Blockchain</strong></td><td>Polygon</td><td>Mainnet/Amoy</td><td>Red blockchain</td></tr>
+<tr><td>Solidity</td><td>0.8.20</td><td>Smart contracts</td></tr>
+<tr><td>Hardhat</td><td>2.x</td><td>Desarrollo/deploy</td></tr>
+<tr><td><strong>Servicios</strong></td><td>Cloudinary</td><td>-</td><td>Storage de imágenes</td></tr>
+<tr><td>Alchemy</td><td>-</td><td>RPC + Webhooks</td></tr>
+<tr><td>Pinata</td><td>-</td><td>IPFS storage</td></tr>
+<tr><td>Web3Auth</td><td>-</td><td>Social login</td></tr></p><p><h2>2.3 Arquitectura de Smart Contracts</h2></p><p><pre><code class="">┌─────────────────────────────────────────────────────────────────────────┐
+│                         SMART CONTRACTS                                  │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │                     PropertyToken (ERC1155)                       │  │
+│  │  • createProperty(tokenId, supply, metadataUri, royaltyFee)      │  │
+│  │  • balanceOf(account, tokenId)                                    │  │
+│  │  • safeTransferFrom(from, to, tokenId, amount)                   │  │
+│  │  • setApprovalForAll(operator, approved)                          │  │
+│  │  Roles: DEFAULT_ADMIN, MINTER, PAUSER                            │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+│                              │                                          │
+│                              │ approves                                 │
+│                              ▼                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │                   PropertyMarketplace                             │  │
+│  │  • createListing(tokenId, amount, price, paymentToken)           │  │
+│  │  • buy(listingId, amount)                                         │  │
+│  │  • cancelListing(listingId)                                       │  │
+│  │  • setKYCApproved(user, approved)                                │  │
+│  │  • setMarketplaceFee(basisPoints)                                │  │
+│  │  Verificaciones: KYC, tokens aprobados, fees                     │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+│                              │                                          │
+│                              │ payments                                 │
+│                              ▼                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │                   PaymentProcessor                                │  │
+│  │  • acceptedPaymentTokens: [USDC, USDT, MATIC]                    │  │
+│  │  • processPayment(token, from, to, amount)                       │  │
+│  │  • setKYCApproved(user, approved)                                │  │
+│  │  • addPaymentToken(token) / removePaymentToken(token)            │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │                   RoyaltyDistributor                              │  │
+│  │  • createDistribution(tokenId, amount, paymentToken)             │  │
+│  │  • claim(distributionId)                                          │  │
+│  │  • getClaimableAmount(distributionId, user)                      │  │
+│  │  Snapshot de holders al momento de distribución                  │  │
+│  └──────────────────────────────────────────────────────────────────┘  │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+</code></pre></p><p><strong>Redes Soportadas:</strong>
+<li>Polygon Mainnet (Chain ID: 137)</li>
+<li>Polygon Amoy Testnet (Chain ID: 80002)</li></p><p><h2>2.4 Flujos de Datos Principales</h2></p><p><h3>2.4.1 Registro y Autenticación</h3></p><p><pre><code class="">Usuario                  Frontend                  API                    DB
+   │                        │                       │                      │
+   │──Login via Web3Auth───►│                       │                      │
+   │                        │──POST /api/auth/login─►│                      │
+   │                        │                       │──findOrCreate User──►│
+   │                        │                       │◄──────User data──────│
+   │                        │                       │──Generate JWT─────────
+   │                        │◄──Set HTTP-only cookie│                      │
+   │◄──Autenticado─────────│                       │                      │
+</code></pre></p><p><h3>2.4.2 Compra de Tokens</h3></p><p><pre><code class="">Usuario                  Frontend                Smart Contract           DB
+   │                        │                       │                      │
+   │──Selecciona propiedad─►│                       │                      │
+   │──Cantidad + Pago──────►│                       │                      │
+   │                        │──approve(USDC)───────►│                      │
+   │◄──Confirma en wallet───│                       │                      │
+   │                        │──buy(listingId)──────►│                      │
+   │                        │                       │──Transfer tokens─────│
+   │                        │                       │──Transfer payment────│
+   │                        │◄──TX confirmada───────│                      │
+   │                        │──POST /api/transactions│─────Record TX──────►│
+   │◄──Compra exitosa───────│                       │                      │
+</code></pre></p><p><h3>2.4.3 Distribución de Dividendos</h3></p><p><pre><code class="">Admin                    Frontend              Smart Contract              DB
+   │                        │                       │                      │
+   │──Crear distribución───►│                       │                      │
+   │                        │──approve(USDC)───────►│                      │
+   │                        │──createDistribution()─►│                      │
+   │                        │                       │──Snapshot holders────│
+   │                        │◄──distributionId──────│                      │
+   │                        │──POST /api/dividends──│──────────────────────►│
+   │◄──Distribución creada──│                       │                      │
+   │                        │                       │                      │
+Usuario                     │                       │                      │
+   │──Ver dividendos───────►│                       │                      │
+   │                        │──claim(distId)───────►│                      │
+   │                        │                       │──Transfer payment────│
+   │◄──Dividendo reclamado──│                       │                      │
+</code></pre></p><p><h2>2.5 Patrones de Diseño</h2></p><p><h3>2.5.1 Arquitectura en Capas</h3></p><p><tr><td>Capa</td><td>Responsabilidad</td><td>Ejemplo</td></tr></p><p><tr><td><strong>Presentación</strong></td><td>UI/UX, estado local</td><td>React Components, Zustand</td></tr>
+<tr><td><strong>API</strong></td><td>Validación, routing, auth</td><td>Next.js API Routes</td></tr>
+<tr><td><strong>Servicios</strong></td><td>Lógica de negocio</td><td>marketplace.service.ts</td></tr>
+<tr><td><strong>Datos</strong></td><td>Persistencia</td><td>Prisma + PostgreSQL</td></tr>
+<tr><td><strong>Blockchain</strong></td><td>Transacciones on-chain</td><td>Smart Contracts</td></tr></p><p><h3>2.5.2 Patrones Utilizados</h3></p><p><li><strong>Repository Pattern</strong>: Services encapsulan acceso a datos</li>
+<li><strong>Factory Pattern</strong>: Creación de tokens/distribuciones</li>
+<li><strong>Observer Pattern</strong>: Webhooks de Alchemy para eventos blockchain</li>
+<li><strong>Singleton</strong>: Configuración del sistema (SystemConfig)</li>
+<li><strong>Strategy Pattern</strong>: Múltiples tokens de pago</li></p><p><h2>2.6 Seguridad</h2></p><p><h3>Capas de Seguridad</h3></p><p><pre><code class="">┌─────────────────────────────────────────────────────────────────┐
+│                    SEGURIDAD MULTICAPA                           │
+├─────────────────────────────────────────────────────────────────┤
+│  1. AUTENTICACIÓN                                                │
+│     └─ Web3Auth (Social) + JWT (7 días) + HTTP-only cookies     │
+├─────────────────────────────────────────────────────────────────┤
+│  2. AUTORIZACIÓN                                                 │
+│     └─ Roles on-chain: DEFAULT_ADMIN, ADMIN, MINTER, PAUSER    │
+│     └─ Cache de 60s para verificación admin                     │
+├─────────────────────────────────────────────────────────────────┤
+│  3. KYC                                                          │
+│     └─ Documentos en Cloudinary (URLs firmadas)                 │
+│     └─ Aprobación dual: Marketplace + PaymentProcessor          │
+├─────────────────────────────────────────────────────────────────┤
+│  4. SMART CONTRACTS                                              │
+│     └─ OpenZeppelin (auditado)                                  │
+│     └─ ReentrancyGuard                                          │
+│     └─ Pausable (circuit breaker)                               │
+│     └─ AccessControl                                            │
+├─────────────────────────────────────────────────────────────────┤
+│  5. VALIDACIÓN                                                   │
+│     └─ Server-side validation en todas las rutas                │
+│     └─ Sanitización de inputs                                   │
+└─────────────────────────────────────────────────────────────────┘
+</code></pre></p><p><h3>Roles del Sistema</h3></p><p><tr><td>Rol</td><td>Scope</td><td>Permisos</td></tr></p><p><tr><td>DEFAULT_ADMIN_ROLE</td><td>Contratos</td><td>Control total, otorga otros roles</td></tr>
+<tr><td>ADMIN_ROLE</td><td>App + Contratos</td><td>Panel admin, pausar, configurar</td></tr>
+<tr><td>MINTER_ROLE</td><td>PropertyToken</td><td>Crear nuevas propiedades</td></tr>
+<tr><td>PAUSER_ROLE</td><td>Todos</td><td>Pausar contratos en emergencia</td></tr>
+<tr><td>USER</td><td>App</td><td>Comprar, vender, reclamar dividendos</td></tr></p><p><h2>2.7 Integraciones Externas</h2></p><p><tr><td>Servicio</td><td>Uso</td><td>Datos Intercambiados</td></tr></p><p><tr><td><strong>Web3Auth</strong></td><td>Login social</td><td>OAuth tokens, user info</td></tr>
+<tr><td><strong>Alchemy</strong></td><td>RPC + Webhooks</td><td>Transacciones, eventos</td></tr>
+<tr><td><strong>Cloudinary</strong></td><td>Storage</td><td>Imágenes KYC, propiedades</td></tr>
+<tr><td><strong>Pinata</strong></td><td>IPFS</td><td>Metadata de tokens</td></tr>
+<tr><td><strong>Polygon RPC</strong></td><td>Blockchain</td><td>Transacciones on-chain</td></tr></p><p><div style="page-break-after: always;"></div></p><p><h1>3. API Reference</h1></p><p><h2>3.1 Información General</h2></p><p><strong>Base URL:</strong> <code>https://your-domain.com/api</code></p><p><strong>Formato de Respuesta:</strong>
+<pre><code class="json">{
+  "success": true | false,
+  "data": {} | null,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Mensaje descriptivo"
+  } | null
+}
+</code></pre></p><p><strong>Autenticación:</strong>
+<li>Header: <code>x-wallet-address: 0x...</code></li>
+<li>Cookie: <code>auth-token</code> (HTTP-only, 7 días)</li></p><p><h2>3.2 Autenticación (Auth)</h2></p><p><h3>POST /api/auth/login</h3></p><p>Crea sesión de usuario o registra nuevo usuario.</p><p><strong>Request:</strong>
+<pre><code class="json">{
+  "walletAddress": "0x1234...",
+  "email": "user@example.com",
+  "name": "Nombre Usuario",
+  "profileImage": "https://..."
+}
+</code></pre></p><p><strong>Response:</strong>
+<pre><code class="json">{
+  "success": true,
+  "data": {
+    "user": {
+      "id": "clxyz123",
+      "walletAddress": "0x1234...",
+      "email": "user@example.com",
+      "name": "Nombre Usuario",
+      "role": "USER",
+      "kycStatus": "NONE"
+    },
+    "token": "eyJhbG..."
+  }
+}
+</code></pre></p><p><h3>POST /api/auth/logout</h3></p><p>Cierra la sesión actual.</p><p><h3>GET /api/auth/session</h3></p><p>Obtiene la sesión actual.</p><p><h3>POST /api/auth/verify</h3></p><p>Verifica firma de mensaje.</p><p><h2>3.3 KYC</h2></p><p><h3>POST /api/kyc</h3></p><p>Envía documentos KYC.</p><p><strong>Headers:</strong> <code>x-wallet-address: 0x...</code></p><p><strong>Request:</strong>
+<pre><code class="json">{
+  "idFrontUrl": "https://cloudinary.com/...",
+  "idBackUrl": "https://cloudinary.com/...",
+  "selfieUrl": "https://cloudinary.com/..."
+}
+</code></pre></p><p><h3>GET /api/kyc/status</h3></p><p>Consulta estado de KYC.</p><p><h3>POST /api/kyc/upload</h3></p><p>Sube documento KYC a Cloudinary.</p><p><strong>Request:</strong> FormData
+<li><code>file</code>: Archivo (JPEG, PNG, WebP, max 5MB)</li>
+<li><code>documentType</code>: <code>"idFront"</code> <tr><td><code>"idBack"</code></td></tr> <code>"selfie"</code></li></p><p><h2>3.4 Propiedades</h2></p><p><h3>GET /api/properties</h3></p><p>Lista propiedades con filtros.</p><p><strong>Query Parameters:</strong></p><p><tr><td>Param</td><td>Tipo</td><td>Default</td><td>Descripción</td></tr></p><p><tr><td>status</td><td>string</td><td>-</td><td>Filtrar por estado</td></tr>
+<tr><td>type</td><td>string</td><td>-</td><td>Filtrar por tipo</td></tr>
+<tr><td>page</td><td>int</td><td>1</td><td>Página</td></tr>
+<tr><td>limit</td><td>int</td><td>10</td><td>Por página</td></tr></p><p><h3>POST /api/properties</h3></p><p>Crea nueva propiedad (Admin).</p><p><h3>GET /api/properties/{id}</h3></p><p>Obtiene detalle de propiedad.</p><p><h3>PATCH /api/properties/{id}</h3></p><p>Actualiza propiedad (Admin).</p><p><h3>GET /api/properties/{id}/listings</h3></p><p>Lista listings activos de la propiedad.</p><p><h3>GET /api/properties/{id}/dividends</h3></p><p>Lista dividendos de la propiedad.</p><p><h3>GET /api/properties/next-token-id</h3></p><p>Obtiene siguiente tokenId disponible.</p><p><h2>3.5 Marketplace</h2></p><p><h3>GET /api/marketplace/listings</h3></p><p>Lista todos los listings.</p><p><strong>Query Parameters:</strong></p><p><tr><td>Param</td><td>Tipo</td><td>Descripción</td></tr></p><p><tr><td>propertyId</td><td>string</td><td>Filtrar por propiedad</td></tr>
+<tr><td>seller</td><td>address</td><td>Filtrar por vendedor</td></tr>
+<tr><td>status</td><td>string</td><td>ACTIVE, SOLD, CANCELLED</td></tr>
+<tr><td>page</td><td>int</td><td>Página</td></tr>
+<tr><td>limit</td><td>int</td><td>Por página</td></tr></p><p><h3>POST /api/marketplace/listings</h3></p><p>Crea nuevo listing.</p><p><h3>GET /api/marketplace/listings/{id}</h3></p><p>Obtiene detalle del listing.</p><p><h3>PUT /api/marketplace/listings/{id}</h3></p><p>Actualiza estado del listing (venta/cancelación).</p><p><h3>DELETE /api/marketplace/listings/{id}</h3></p><p>Cancela listing.</p><p><h2>3.6 Usuarios</h2></p><p><h3>GET /api/users</h3></p><p>Lista todos los usuarios (Admin).</p><p><h3>GET /api/users/{address}</h3></p><p>Obtiene perfil de usuario.</p><p><h3>PUT /api/users/{address}</h3></p><p>Actualiza perfil de usuario.</p><p><h3>GET /api/users/{address}/portfolio</h3></p><p>Obtiene portfolio del usuario.</p><p><h3>GET /api/users/{address}/transactions</h3></p><p>Obtiene transacciones del usuario.</p><p><h3>POST /api/users/{address}/profile-image</h3></p><p>Sube imagen de perfil.</p><p><h3>DELETE /api/users/{address}/profile-image</h3></p><p>Elimina imagen de perfil.</p><p><h2>3.7 Transacciones</h2></p><p><h3>GET /api/transactions</h3></p><p>Lista transacciones del usuario.</p><p><h3>GET /api/transactions/{hash}</h3></p><p>Obtiene detalle de transacción.</p><p><h2>3.8 Dividendos</h2></p><p><h3>GET /api/dividends</h3></p><p>Lista dividendos reclamables del usuario.</p><p><h3>POST /api/dividends/claim</h3></p><p>Prepara claim de dividendos.</p><p><h3>PUT /api/dividends/claim</h3></p><p>Confirma claim de dividendos.</p><p><h3>GET /api/dividends/history</h3></p><p>Historial de dividendos reclamados.</p><p><h2>3.9 Admin</h2></p><p><h3>GET /api/admin/check</h3></p><p>Verifica si usuario es admin.</p><p><h3>GET /api/admin/dashboard</h3></p><p>Dashboard con métricas.</p><p><h3>GET /api/admin/kyc</h3></p><p>Lista submissions KYC.</p><p><h3>GET /api/admin/kyc/{id}</h3></p><p>Obtiene detalle de submission KYC.</p><p><h3>PUT /api/admin/kyc/{id}</h3></p><p>Aprueba o rechaza KYC.</p><p><h3>GET /api/admin/dividends</h3></p><p>Lista todos los dividendos (Admin).</p><p><h3>POST /api/admin/dividends</h3></p><p>Crea nueva distribución de dividendos.</p><p><h3>GET /api/admin/dividends/{id}</h3></p><p>Detalle de dividendo con estadísticas.</p><p><h3>POST /api/admin/dividends/{id}/distribute</h3></p><p>Ejecuta distribución on-chain.</p><p><h3>DELETE /api/admin/dividends/{id}</h3></p><p>Cancela dividendo pendiente.</p><p><h3>GET /api/admin/roles</h3></p><p>Consulta roles de una wallet.</p><p><h3>POST /api/admin/roles</h3></p><p>Otorga o revoca roles.</p><p><h3>GET /api/admin/roles/history</h3></p><p>Historial de cambios de roles.</p><p><h3>POST /api/upload</h3></p><p>Sube imágenes (Admin).</p><p><h2>3.10 Códigos de Error</h2></p><p><tr><td>Código</td><td>HTTP Status</td><td>Descripción</td></tr></p><p><tr><td>UNAUTHORIZED</td><td>401</td><td>No autenticado</td></tr>
+<tr><td>FORBIDDEN</td><td>403</td><td>Sin permisos</td></tr>
+<tr><td>NOT_FOUND</td><td>404</td><td>Recurso no encontrado</td></tr>
+<tr><td>BAD_REQUEST</td><td>400</td><td>Datos inválidos</td></tr>
+<tr><td>CONFLICT</td><td>409</td><td>Conflicto de datos</td></tr>
+<tr><td>INTERNAL_ERROR</td><td>500</td><td>Error interno</td></tr>
+<tr><td>KYC_REQUIRED</td><td>403</td><td>KYC requerido</td></tr>
+<tr><td>KYC_NOT_APPROVED</td><td>403</td><td>KYC no aprobado</td></tr>
+<tr><td>LISTING_NOT_FOUND</td><td>404</td><td>Listing no existe</td></tr>
+<tr><td>INSUFFICIENT_BALANCE</td><td>400</td><td>Balance insuficiente</td></tr></p><p><h2>3.11 Rate Limits</h2></p><p><tr><td>Endpoint</td><td>Límite</td></tr></p><p><tr><td>/api/auth/*</td><td>10 req/min</td></tr>
+<tr><td>/api/kyc/upload</td><td>5 req/min</td></tr>
+<tr><td>/api/upload</td><td>10 req/min</td></tr>
+<tr><td>Otros</td><td>100 req/min</td></tr></p><p><h2>3.12 Resumen de Endpoints</h2></p><p><tr><td>Módulo</td><td>Endpoints</td><td>Auth Requerido</td></tr></p><p><tr><td>Auth</td><td>4</td><td>Parcial</td></tr>
+<tr><td>KYC</td><td>3</td><td>Sí</td></tr>
+<tr><td>Properties</td><td>7</td><td>Parcial</td></tr>
+<tr><td>Marketplace</td><td>5</td><td>Parcial</td></tr>
+<tr><td>Users</td><td>7</td><td>Parcial</td></tr>
+<tr><td>Transactions</td><td>2</td><td>Sí</td></tr>
+<tr><td>Dividends</td><td>4</td><td>Sí</td></tr>
+<tr><td>Admin</td><td>12</td><td>Admin</td></tr>
+<tr><td>Otros</td><td>4</td><td>No</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>48</strong></td><td>-</td></tr></p><p><div style="page-break-after: always;"></div></p><p><h1>4. Manual de Usuario</h1></p><p><h2>4.1 Introducción</h2></p><p>TokenByU es una plataforma de inversión en bienes raíces tokenizados. Permite comprar fracciones de propiedades inmobiliarias como tokens digitales en la blockchain de Polygon, recibir dividendos y comerciar en el marketplace.</p><p><h2>4.2 Primeros Pasos</h2></p><p><h3>Requisitos</h3></p><p><li>Navegador web moderno (Chrome, Firefox, Safari, Edge)</li>
+<li>Wallet de criptomonedas (MetaMask recomendado) o cuenta de email/social</li>
+<li>Tokens USDC, USDT o MATIC para inversiones</li></p><p><h3>Crear Cuenta / Conectar Wallet</h3></p><p><li>Visita la plataforma en el navegador</li>
+<li>Click en <strong>"Conectar Wallet"</strong></li>
+<li>Elige tu método de conexión:</li>
+   - <strong>MetaMask/Coinbase:</strong> Conecta tu wallet existente
+   - <strong>Email/Social:</strong> Usa Web3Auth para crear wallet automáticamente
+<li>Firma el mensaje de verificación</li>
+<li>Tu cuenta está creada automáticamente</li></p><p><h3>Configurar Red Polygon</h3></p><p>Si usas MetaMask, configura la red Polygon:</p><p><pre><code class="">Network Name: Polygon Mainnet
+RPC URL: https://polygon-rpc.com
+Chain ID: 137
+Symbol: MATIC
+Explorer: https://polygonscan.com
+</code></pre></p><p><h2>4.3 Verificación KYC</h2></p><p><h3>Por qué es necesario</h3></p><p>El KYC (Know Your Customer) es requerido para:
+<li>Comprar tokens de propiedades</li>
+<li>Vender en el marketplace</li>
+<li>Reclamar dividendos</li></p><p><h3>Proceso de Verificación</h3></p><p><li>Ve a <strong>Perfil > KYC</strong></li>
+<li>Prepara los siguientes documentos:</li>
+   - Foto del frente de tu identificación (INE/Pasaporte)
+   - Foto del reverso de tu identificación
+   - Selfie sosteniendo tu identificación
+<li>Sube cada documento en la sección correspondiente</li>
+<li>Click en <strong>"Enviar para Revisión"</strong></li>
+<li>Espera la aprobación (1-3 días hábiles)</li></p><p><h3>Estados del KYC</h3></p><p><tr><td>Estado</td><td>Descripción</td></tr></p><p><tr><td>Sin enviar</td><td>No has iniciado el proceso</td></tr>
+<tr><td>Pendiente</td><td>Documentos enviados, en revisión</td></tr>
+<tr><td>Aprobado</td><td>Puedes operar en la plataforma</td></tr>
+<tr><td>Rechazado</td><td>Revisa las notas del admin y reenvía</td></tr></p><p><h2>4.4 Explorar Propiedades</h2></p><p><h3>Catálogo</h3></p><p><li>Ve a <strong>Explorar</strong> en el menú principal</li>
+<li>Usa los filtros para encontrar propiedades:</li>
+   - <strong>Tipo:</strong> Residencial, Comercial, Industrial, Mixto
+   - <strong>Precio:</strong> Rango de precio por fracción
+   - <strong>ROI Estimado:</strong> Rendimiento esperado
+   - <strong>Estado:</strong> Activas, Vendidas, etc.</p><p><h3>Detalles de Propiedad</h3></p><p>Cada propiedad muestra:
+<li><strong>Galería de imágenes</strong></li>
+<li><strong>Ubicación</strong> con mapa interactivo</li>
+<li><strong>Descripción</strong> detallada</li>
+<li><strong>Documentos</strong> legales (escrituras, avalúos)</li>
+<li><strong>Métricas:</strong></li>
+  - Precio por fracción
+  - Total de fracciones
+  - Fracciones disponibles
+  - ROI estimado
+  - Historial de dividendos</p><p><h2>4.5 Comprar Tokens</h2></p><p><h3>Compra Directa (Propiedades Nuevas)</h3></p><p><li>Selecciona una propiedad con fracciones disponibles</li>
+<li>Click en <strong>"Comprar Fracciones"</strong></li>
+<li>Ingresa la cantidad de fracciones</li>
+<li>Selecciona token de pago (USDC/USDT/MATIC)</li>
+<li>Revisa el resumen:</li>
+   - Cantidad de tokens
+   - Precio total
+   - Fee de plataforma
+<li>Click en <strong>"Aprobar"</strong> para autorizar el gasto</li>
+<li>Confirma la transacción en tu wallet</li>
+<li>Click en <strong>"Comprar"</strong> para finalizar</li></p><p><h3>Compra en Marketplace (P2P)</h3></p><p><li>Ve a <strong>Marketplace</strong></li>
+<li>Encuentra listados de otros usuarios</li>
+<li>Click en <strong>"Comprar"</strong> en el listado deseado</li>
+<li>Sigue el proceso de aprobación y confirmación</li></p><p><h3>Tokens de Pago</h3></p><p><tr><td>Token</td><td>Descripción</td></tr></p><p><tr><td>USDC</td><td>Stablecoin de Circle (recomendado)</td></tr>
+<tr><td>USDT</td><td>Stablecoin de Tether</td></tr>
+<tr><td>MATIC</td><td>Token nativo de Polygon</td></tr></p><p><h2>4.6 Tu Portfolio</h2></p><p><h3>Ver Inversiones</h3></p><p><li>Ve a <strong>Perfil > Portfolio</strong></li>
+<li>Visualiza todas tus propiedades:</li>
+   - Nombre de propiedad
+   - Tokens que posees
+   - Valor actual
+   - Rendimiento</p><p><h3>Historial de Transacciones</h3></p><p>En <strong>Perfil > Transacciones</strong> puedes ver:
+<li>Fecha y hora</li>
+<li>Tipo (Compra/Venta/Dividendo)</li>
+<li>Cantidad</li>
+<li>Hash de transacción (click para ver en explorer)</li></p><p><h2>4.7 Marketplace</h2></p><p><h3>Crear Listado de Venta</h3></p><p><li>Ve a <strong>Marketplace > Mis Listados</strong></li>
+<li>Click en <strong>"Nuevo Listado"</strong></li>
+<li>Selecciona la propiedad y cantidad de tokens</li>
+<li>Establece el precio por token</li>
+<li>Selecciona token de pago aceptado</li>
+<li>Confirma en tu wallet</li>
+<li>Tu listado aparece en el marketplace</li></p><p><h3>Gestionar Listados</h3></p><p><li><strong>Editar precio:</strong> Click en "Editar" para cambiar precio</li>
+<li><strong>Cancelar:</strong> Click en "Cancelar" para retirar del marketplace</li>
+<li><strong>Ver ofertas:</strong> Revisa ofertas recibidas</li></p><p><h2>4.8 Dividendos</h2></p><p><h3>Cómo Funcionan</h3></p><p>Los dividendos son distribuciones de ganancias de las propiedades:
+<li>Se distribuyen periódicamente (mensual/trimestral)</li>
+<li>Se calculan proporcional a tus tokens</li>
+<li>Se pagan en USDC/USDT</li></p><p><h3>Reclamar Dividendos</h3></p><p><li>Ve a <strong>Perfil > Dividendos</strong></li>
+<li>Verás dividendos pendientes de cobro</li>
+<li>Click en <strong>"Reclamar"</strong> en cada dividendo</li>
+<li>Confirma la transacción</li>
+<li>Los tokens se envían a tu wallet</li></p><p><h2>4.9 Seguridad</h2></p><p><h3>Protege tu Cuenta</h3></p><p><li><strong>Nunca compartas tu seed phrase</strong></li>
+<li><strong>Verifica siempre las URLs</strong> antes de firmar</li>
+<li><strong>Usa autenticación de dos factores</strong> si tu wallet lo soporta</li>
+<li><strong>Revisa los detalles</strong> de cada transacción antes de firmar</li></p><p><h3>Qué Hacer si...</h3></p><p><strong>Perdí acceso a mi wallet:</strong>
+<li>Si usaste Web3Auth, recupera con tu email/social</li>
+<li>Si usaste MetaMask, usa tu seed phrase de respaldo</li></p><p><strong>Veo una transacción que no reconozco:</strong>
+<li>Contacta soporte inmediatamente</li>
+<li>No apruebes más transacciones</li></p><p><h2>4.10 Glosario</h2></p><p><tr><td>Término</td><td>Definición</td></tr></p><p><tr><td><strong>Token</strong></td><td>Representación digital de una fracción de propiedad</td></tr>
+<tr><td><strong>Wallet</strong></td><td>Cartera digital para almacenar criptomonedas</td></tr>
+<tr><td><strong>Gas</strong></td><td>Comisión pagada por transacciones en blockchain</td></tr>
+<tr><td><strong>USDC/USDT</strong></td><td>Stablecoins (1 token = 1 USD)</td></tr>
+<tr><td><strong>Dividendo</strong></td><td>Distribución de ganancias a holders</td></tr>
+<tr><td><strong>KYC</strong></td><td>Verificación de identidad</td></tr>
+<tr><td><strong>Polygon</strong></td><td>Red blockchain donde opera TokenByU</td></tr></p><p><div style="page-break-after: always;"></div></p><p><h1>5. Manual de Administrador</h1></p><p><h2>5.1 Introducción</h2></p><p>Este manual cubre las funcionalidades del panel de administración de TokenByU. Solo usuarios con rol ADMIN pueden acceder a estas funciones.</p><p><h2>5.2 Acceso al Panel Admin</h2></p><p><h3>Requisitos</h3></p><p><li>Wallet con rol ADMIN en el contrato PropertyToken</li>
+<li>KYC aprobado</li>
+<li>Conexión a la red correcta (Polygon Mainnet/Amoy)</li></p><p><h3>Verificación de Rol</h3></p><p>El sistema verifica tu rol admin:
+<li>Consulta on-chain al contrato PropertyToken</li>
+<li>Verifica <code>hasRole(ADMIN_ROLE, address)</code> o <code>hasRole(DEFAULT_ADMIN_ROLE, address)</code></li>
+<li>Cache de 60 segundos para optimizar</li></p><p><h3>Acceder</h3></p><p><li>Conecta tu wallet admin</li>
+<li>Ve a <code>/admin</code> o click en "Admin" en el menú</li>
+<li>Si no tienes rol, verás mensaje de error</li></p><p><h2>5.3 Dashboard</h2></p><p><h3>Métricas Principales</h3></p><p><tr><td>Métrica</td><td>Descripción</td></tr></p><p><tr><td><strong>Usuarios Totales</strong></td><td>Número de wallets registradas</td></tr>
+<tr><td><strong>KYC Pendientes</strong></td><td>Submissions esperando revisión</td></tr>
+<tr><td><strong>Propiedades Activas</strong></td><td>Propiedades publicadas</td></tr>
+<tr><td><strong>Volumen Total</strong></td><td>Suma de todas las transacciones</td></tr>
+<tr><td><strong>Dividendos Distribuidos</strong></td><td>Total de dividendos pagados</td></tr></p><p><h3>Alertas</h3></p><p>El dashboard muestra alertas para:
+<li>KYC pendientes > 5</li>
+<li>Propiedades pendientes de revisión</li>
+<li>Errores en webhooks</li>
+<li>Contratos pausados</li></p><p><h2>5.4 Gestión de Usuarios</h2></p><p><h3>Lista de Usuarios</h3></p><p>Accede en <strong>Admin > Usuarios</strong></p><p><strong>Filtros disponibles:</strong>
+<li>Búsqueda por wallet/email/nombre</li>
+<li>Estado de KYC</li>
+<li>Rol (User/Admin)</li>
+<li>Fecha de registro</li></p><p><strong>Información mostrada:</strong>
+<li>Wallet address</li>
+<li>Email</li>
+<li>Nombre</li>
+<li>KYC Status</li>
+<li># de propiedades</li>
+<li># de transacciones</li>
+<li>Fecha registro</li></p><p><h3>Acciones</h3></p><p><tr><td>Acción</td><td>Descripción</td></tr></p><p><tr><td>Ver detalle</td><td>Información completa del usuario</td></tr>
+<tr><td>Editar</td><td>Modificar nombre/email</td></tr>
+<tr><td>Cambiar rol</td><td>Otorgar/revocar rol admin</td></tr></p><p><h2>5.5 Gestión de KYC</h2></p><p><h3>Cola de Revisión</h3></p><p><strong>Admin > KYC</strong> muestra submissions pendientes ordenadas por fecha (más antiguas primero).</p><p><h3>Revisar Submission</h3></p><p>Para cada submission:</p><p><li><strong>Documentos a revisar:</strong></li>
+   - ID Frontal (foto clara, datos legibles)
+   - ID Reverso (datos coinciden)
+   - Selfie (persona = foto ID, documento visible)</p><p><li><strong>Verificaciones:</strong></li>
+   - [ ] Documento no expirado
+   - [ ] Fotos claras, sin edición
+   - [ ] Datos coinciden
+   - [ ] Selfie verificable</p><p><li><strong>Acciones:</strong></li>
+   - <strong>Aprobar:</strong> Usuario puede operar
+   - <strong>Rechazar:</strong> Incluir notas con razón</p><p><h2>5.6 Gestión de Propiedades</h2></p><p><h3>Crear Nueva Propiedad</h3></p><p><li>Click <strong>"Nueva Propiedad"</strong></li>
+<li>Completa el formulario:</li></p><p><strong>Información Básica:</strong>
+<li>Nombre</li>
+<li>Descripción</li>
+<li>Ubicación</li>
+<li>Tipo (Comercial, Residencial, etc.)</li></p><p><strong>Imágenes:</strong>
+<li>Sube 5-10 fotos de alta calidad</li>
+<li>Formatos: JPG, PNG</li>
+<li>Tamaño máximo: 5MB por imagen</li></p><p><strong>Documentos:</strong>
+<li>Escrituras (PDF)</li>
+<li>Avalúo (PDF)</li>
+<li>Planos (PDF)</li></p><p><strong>Financieros:</strong>
+<li>Total de fracciones</li>
+<li>Precio por fracción</li>
+<li>ROI estimado</li>
+<li>Timeline</li></p><p><h3>Flujo de Aprobación</h3></p><p><pre><code class="">DRAFT → PENDING_REVIEW → APPROVED/REJECTED → ACTIVE
+</code></pre></p><p><h3>Mintear Tokens</h3></p><p>Una vez APPROVED:</p><p><li>Ve a <strong>Propiedad > Acciones > Mintear</strong></li>
+<li>Verifica: Token ID, Supply, Metadata URI, Royalty fee</li>
+<li>Click <strong>"Mintear Tokens"</strong></li>
+<li>Confirma transacción en wallet</li>
+<li>Espera confirmación (30-60 segundos)</li>
+<li>Propiedad cambia a ACTIVE</li></p><p><h2>5.7 Gestión de Contratos</h2></p><p><h3>Vista de Contratos</h3></p><p><strong>Admin > Contratos</strong> muestra:</p><p><tr><td>Contrato</td><td>Funciones</td></tr></p><p><tr><td>PropertyToken</td><td>Mintear, pausar, roles</td></tr>
+<tr><td>Marketplace</td><td>Pausar, fees, treasury</td></tr>
+<tr><td>RoyaltyDistributor</td><td>Pausar, distribuir</td></tr></p><p><h3>Acciones Disponibles</h3></p><p><li><strong>Pausar/Despausar:</strong> Detiene operaciones</li>
+<li><strong>Grant/Revoke Roles:</strong> Gestión de permisos</li>
+<li><strong>Set Fee:</strong> Cambiar comisión</li>
+<li><strong>Set Treasury:</strong> Cambiar wallet de fees</li>
+<li><strong>Add/Remove Payment Token:</strong> Gestionar tokens aceptados</li></p><p><h2>5.8 Distribución de Dividendos</h2></p><p><h3>Crear Distribución</h3></p><p><li>Ve a <strong>Admin > Dividendos > Nueva Distribución</strong></li>
+<li>Selecciona: Propiedad, Monto total, Token de pago, Período</li>
+<li>Sistema calcula automáticamente: Monto por token, Lista de beneficiarios</li>
+<li>Click <strong>"Crear Distribución"</strong></li></p><p><h3>Aprobar y Ejecutar</h3></p><p><li>Distribución creada en estado PENDING</li>
+<li>Revisa beneficiarios y montos</li>
+<li>Click <strong>"Aprobar Tokens"</strong> (allowance al contrato)</li>
+<li>Click <strong>"Distribuir"</strong> para ejecutar on-chain</li>
+<li>Estado cambia a DISTRIBUTED</li></p><p><h2>5.9 Roles y Permisos</h2></p><p><h3>Roles On-Chain</h3></p><p><tr><td>Rol</td><td>Permisos</td></tr></p><p><tr><td>DEFAULT_ADMIN_ROLE</td><td>Control total, puede otorgar otros roles</td></tr>
+<tr><td>ADMIN_ROLE</td><td>Acceso a panel admin</td></tr>
+<tr><td>MINTER_ROLE</td><td>Puede mintear tokens</td></tr>
+<tr><td>PAUSER_ROLE</td><td>Puede pausar contratos</td></tr></p><p><h3>Otorgar Rol Admin</h3></p><p><li>Ve a <strong>Admin > Usuarios</strong></li>
+<li>Busca al usuario</li>
+<li>Click <strong>"Cambiar Rol"</strong></li>
+<li>Selecciona "Admin"</li>
+<li>Confirma transacción on-chain</li></p><p><h3>Auditoría de Roles</h3></p><p>Todos los cambios de roles se registran:
+<li>Wallet afectada</li>
+<li>Acción realizada</li>
+<li>Quién ejecutó</li>
+<li>Timestamp</li>
+<li>TX Hash</li></p><p><h2>5.10 Checklists</h2></p><p><h3>Checklist Diario Admin</h3></p><p><pre><code class="">[ ] Revisar KYC pendientes
+[ ] Verificar propiedades en revisión
+[ ] Revisar alertas del dashboard
+[ ] Verificar estado de contratos
+[ ] Revisar webhooks por errores
+</code></pre></p><p><h3>Checklist Semanal</h3></p><p><pre><code class="">[ ] Revisar métricas del dashboard
+[ ] Verificar volumen de transacciones
+[ ] Revisar claims de dividendos pendientes
+[ ] Backup de configuración
+[ ] Revisar roles de usuarios
+</code></pre></p><p><div style="page-break-after: always;"></div></p><p><h1>6. Modelo de Datos</h1></p><p><h2>6.1 Diagrama Entidad-Relación</h2></p><p><pre><code class="">┌──────────────────┐         ┌──────────────────┐         ┌──────────────────┐
+│      User        │         │    KYCSubmission │         │    Transaction   │
+├──────────────────┤         ├──────────────────┤         ├──────────────────┤
+│ id (PK)          │────────►│ id (PK)          │         │ id (PK)          │
+│ walletAddress    │◄────────│ userId (FK,UQ)   │         │ userId (FK)      │◄───┐
+│ email            │         │ idFrontUrl       │         │ propertyId (FK)  │    │
+│ name             │         │ idBackUrl        │         │ type             │    │
+│ profileImage     │         │ selfieUrl        │         │ txHash (UQ)      │    │
+│ role             │         │ status           │         │ amount           │    │
+│ kycStatus        │         │ adminNotes       │         │ tokenAmount      │    │
+│ createdAt        │         │ reviewedBy       │         │ paymentToken     │    │
+│ updatedAt        │         │ reviewedAt       │         │ status           │    │
+└────────┬─────────┘         │ createdAt        │         │ createdAt        │    │
+         │                   │ updatedAt        │         └──────────────────┘    │
+         │                   └──────────────────┘                                  │
+         │                                                                         │
+         │ 1:N                                                                     │
+         ▼                                                                         │
+┌──────────────────┐                                                               │
+│    Portfolio     │                                                               │
+├──────────────────┤                                                               │
+│ id (PK)          │         ┌──────────────────┐                                  │
+│ userId (FK)      │◄────────│    Property      │                                  │
+│ propertyId (FK)  │────────►├──────────────────┤                                  │
+│ tokenAmount      │         │ id (PK)          │──────────────────────────────────┘
+│ updatedAt        │         │ tokenId (UQ)     │
+└──────────────────┘         │ name             │
+                             │ description      │
+                             │ location         │
+                             │ propertyType     │
+                             │ totalFractions   │
+                             │ pricePerFraction │
+                             │ status           │
+                             │ createdAt        │
+                             └────────┬─────────┘
+                                      │
+                      ┌───────────────┼───────────────┐
+                      │               │               │
+                      ▼               ▼               ▼
+             ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+             │   Listing    │ │   Dividend   │ │  Portfolio   │
+             ├──────────────┤ ├──────────────┤ │  (arriba)    │
+             │ id (PK)      │ │ id (PK)      │ └──────────────┘
+             │ onChainId(UQ)│ │ propertyId(FK)│
+             │ propertyId(FK)│ │ totalAmount  │
+             │ seller       │ │ amountPerToken│
+             │ buyer        │ │ paymentToken │
+             │ amount       │ │ period       │
+             │ pricePerToken│ │ status       │
+             │ status       │ └──────┬───────┘
+             │ createdAt    │        │
+             └──────────────┘        │ 1:N
+                                     ▼
+                             ┌──────────────┐
+                             │DividendClaim │
+                             ├──────────────┤
+                             │ id (PK)      │
+                             │ dividendId(FK)│
+                             │ userAddress  │
+                             │ amount       │
+                             │ claimed      │
+                             │ txHash       │
+                             │ claimedAt    │
+                             └──────────────┘
+</code></pre></p><p><h2>6.2 Descripción de Entidades</h2></p><p><h3>User</h3></p><p>Representa a cada usuario de la plataforma, identificado por su wallet address.</p><p><tr><td>Campo</td><td>Tipo</td><td>Descripción</td></tr></p><p><tr><td><code>id</code></td><td>String (CUID)</td><td>Identificador único</td></tr>
+<tr><td><code>walletAddress</code></td><td>String</td><td>Dirección de wallet (único)</td></tr>
+<tr><td><code>email</code></td><td>String?</td><td>Email opcional</td></tr>
+<tr><td><code>name</code></td><td>String?</td><td>Nombre display</td></tr>
+<tr><td><code>profileImage</code></td><td>String?</td><td>URL de imagen de perfil</td></tr>
+<tr><td><code>role</code></td><td>UserRole</td><td>USER \</td><td>ADMIN</td></tr>
+<tr><td><code>kycStatus</code></td><td>KYCStatus</td><td>NONE \</td><td>PENDING \</td><td>APPROVED \</td><td>REJECTED</td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>Fecha de registro</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td>Última actualización</td></tr></p><p><h3>KYCSubmission</h3></p><p>Documentos de verificación KYC enviados por el usuario.</p><p><tr><td>Campo</td><td>Tipo</td><td>Descripción</td></tr></p><p><tr><td><code>id</code></td><td>String (CUID)</td><td>Identificador único</td></tr>
+<tr><td><code>userId</code></td><td>String</td><td>FK a User (único)</td></tr>
+<tr><td><code>idFrontUrl</code></td><td>String</td><td>URL Cloudinary del ID frontal</td></tr>
+<tr><td><code>idBackUrl</code></td><td>String</td><td>URL Cloudinary del ID reverso</td></tr>
+<tr><td><code>selfieUrl</code></td><td>String</td><td>URL Cloudinary del selfie</td></tr>
+<tr><td><code>status</code></td><td>KYCStatus</td><td>Estado de la verificación</td></tr>
+<tr><td><code>adminNotes</code></td><td>String?</td><td>Notas del admin</td></tr>
+<tr><td><code>reviewedBy</code></td><td>String?</td><td>Wallet del admin que revisó</td></tr>
+<tr><td><code>reviewedAt</code></td><td>DateTime?</td><td>Fecha de revisión</td></tr></p><p><h3>Property</h3></p><p>Propiedad inmobiliaria tokenizada.</p><p><tr><td>Campo</td><td>Tipo</td><td>Descripción</td></tr></p><p><tr><td><code>id</code></td><td>String (CUID)</td><td>Identificador único</td></tr>
+<tr><td><code>tokenId</code></td><td>BigInt?</td><td>ID del token en blockchain (único)</td></tr>
+<tr><td><code>name</code></td><td>String</td><td>Nombre de la propiedad</td></tr>
+<tr><td><code>description</code></td><td>String</td><td>Descripción completa</td></tr>
+<tr><td><code>location</code></td><td>String</td><td>Ubicación física</td></tr>
+<tr><td><code>propertyType</code></td><td>PropertyType</td><td>RESIDENTIAL \</td><td>COMMERCIAL \</td><td>INDUSTRIAL \</td><td>MIXED</td></tr>
+<tr><td><code>totalFractions</code></td><td>Int</td><td>Total de fracciones/tokens</td></tr>
+<tr><td><code>availableFractions</code></td><td>Int</td><td>Fracciones disponibles</td></tr>
+<tr><td><code>pricePerFraction</code></td><td>Decimal(18,6)</td><td>Precio por fracción en USD</td></tr>
+<tr><td><code>estimatedROI</code></td><td>Decimal(5,2)</td><td>ROI estimado %</td></tr>
+<tr><td><code>status</code></td><td>PropertyStatus</td><td>Estado de la propiedad</td></tr></p><p><h3>Listing</h3></p><p>Listado de venta en el marketplace.</p><p><tr><td>Campo</td><td>Tipo</td><td>Descripción</td></tr></p><p><tr><td><code>id</code></td><td>String (CUID)</td><td>Identificador único</td></tr>
+<tr><td><code>onChainListingId</code></td><td>Int?</td><td>ID del listing en el contrato (único)</td></tr>
+<tr><td><code>propertyId</code></td><td>String</td><td>FK a Property</td></tr>
+<tr><td><code>seller</code></td><td>String</td><td>Wallet del vendedor</td></tr>
+<tr><td><code>buyer</code></td><td>String?</td><td>Wallet del comprador (si vendido)</td></tr>
+<tr><td><code>amount</code></td><td>Int</td><td>Cantidad inicial listada</td></tr>
+<tr><td><code>pricePerToken</code></td><td>Decimal(18,6)</td><td>Precio por token</td></tr>
+<tr><td><code>paymentToken</code></td><td>String</td><td>Token de pago</td></tr>
+<tr><td><code>status</code></td><td>ListingStatus</td><td>ACTIVE \</td><td>SOLD \</td><td>CANCELLED</td></tr></p><p><h3>Portfolio</h3></p><p>Tokens que posee cada usuario por propiedad.</p><p><tr><td>Campo</td><td>Tipo</td><td>Descripción</td></tr></p><p><tr><td><code>id</code></td><td>String (CUID)</td><td>Identificador único</td></tr>
+<tr><td><code>userId</code></td><td>String</td><td>FK a User</td></tr>
+<tr><td><code>propertyId</code></td><td>String</td><td>FK a Property</td></tr>
+<tr><td><code>tokenAmount</code></td><td>Int</td><td>Cantidad de tokens</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td>Última actualización</td></tr></p><p><h3>Dividend</h3></p><p>Distribución de dividendos por propiedad.</p><p><tr><td>Campo</td><td>Tipo</td><td>Descripción</td></tr></p><p><tr><td><code>id</code></td><td>String (CUID)</td><td>Identificador único</td></tr>
+<tr><td><code>propertyId</code></td><td>String</td><td>FK a Property</td></tr>
+<tr><td><code>totalAmount</code></td><td>Decimal(18,6)</td><td>Monto total a distribuir</td></tr>
+<tr><td><code>amountPerToken</code></td><td>Decimal(18,6)</td><td>Monto por token</td></tr>
+<tr><td><code>paymentToken</code></td><td>String</td><td>Token de pago</td></tr>
+<tr><td><code>period</code></td><td>String</td><td>Período (ej: "Q1-2024")</td></tr>
+<tr><td><code>status</code></td><td>DividendStatus</td><td>PENDING \</td><td>DISTRIBUTED \</td><td>CANCELLED</td></tr></p><p><h3>DividendClaim</h3></p><p>Reclamo de dividendo por usuario.</p><p><tr><td>Campo</td><td>Tipo</td><td>Descripción</td></tr></p><p><tr><td><code>id</code></td><td>String (CUID)</td><td>Identificador único</td></tr>
+<tr><td><code>dividendId</code></td><td>String</td><td>FK a Dividend</td></tr>
+<tr><td><code>userAddress</code></td><td>String</td><td>Wallet del usuario</td></tr>
+<tr><td><code>amount</code></td><td>Decimal(18,6)</td><td>Monto a reclamar</td></tr>
+<tr><td><code>claimed</code></td><td>Boolean</td><td>Si ya fue reclamado</td></tr>
+<tr><td><code>txHash</code></td><td>String?</td><td>TX del claim</td></tr>
+<tr><td><code>claimedAt</code></td><td>DateTime?</td><td>Fecha del claim</td></tr></p><p><h2>6.3 Enumeraciones</h2></p><p><h3>UserRole</h3>
+<li><code>USER</code> - Usuario regular</li>
+<li><code>ADMIN</code> - Administrador</li></p><p><h3>KYCStatus</h3>
+<li><code>NONE</code> - Sin enviar</li>
+<li><code>PENDING</code> - En revisión</li>
+<li><code>APPROVED</code> - Aprobado</li>
+<li><code>REJECTED</code> - Rechazado</li></p><p><h3>PropertyType</h3>
+<li><code>RESIDENTIAL</code> - Residencial</li>
+<li><code>COMMERCIAL</code> - Comercial</li>
+<li><code>INDUSTRIAL</code> - Industrial</li>
+<li><code>MIXED</code> - Mixto</li></p><p><h3>PropertyStatus</h3>
+<li><code>PENDING_REVIEW</code> - Esperando revisión</li>
+<li><code>APPROVED</code> - Aprobado para deploy</li>
+<li><code>REJECTED</code> - Rechazado</li>
+<li><code>DRAFT</code> - Borrador</li>
+<li><code>ACTIVE</code> - Activo en marketplace</li>
+<li><code>SOLD_OUT</code> - Vendido completamente</li>
+<li><code>PAUSED</code> - Pausado</li></p><p><h3>ListingStatus</h3>
+<li><code>ACTIVE</code> - Listado activo</li>
+<li><code>SOLD</code> - Vendido</li>
+<li><code>CANCELLED</code> - Cancelado</li></p><p><h3>TransactionType</h3>
+<li><code>BUY</code> - Compra de tokens</li>
+<li><code>SELL</code> - Venta de tokens</li>
+<li><code>DIVIDEND_CLAIM</code> - Reclamo de dividendo</li>
+<li><code>DIVIDEND_DISTRIBUTION</code> - Distribución de dividendo</li></p><p><h3>DividendStatus</h3>
+<li><code>PENDING</code> - Pendiente de distribución</li>
+<li><code>DISTRIBUTED</code> - Distribuido</li>
+<li><code>CANCELLED</code> - Cancelado</li></p><p><div style="page-break-after: always;"></div></p><p><h1>7. Documentación de Seguridad</h1></p><p><h2>7.1 Modelo de Seguridad</h2></p><p><h3>Capas de Seguridad</h3></p><p><pre><code class="">┌─────────────────────────────────────────────────────────────────┐
+│                    CAPA DE PRESENTACIÓN                          │
+│  • HTTPS obligatorio                                             │
+│  • CSP Headers                                                   │
+│  • XSS Protection                                                │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────────┐
+│                    CAPA DE AUTENTICACIÓN                         │
+│  • Web3Auth (OAuth 2.0)                                         │
+│  • JWT con HTTP-only cookies                                     │
+│  • Verificación de firma on-chain                               │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────────┐
+│                    CAPA DE AUTORIZACIÓN                          │
+│  • Roles on-chain (ADMIN_ROLE, MINTER_ROLE, PAUSER_ROLE)       │
+│  • KYC verificado para operaciones                               │
+│  • Validación de propiedad de recursos                          │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+┌─────────────────────────────────────────────────────────────────┐
+│                    CAPA DE SMART CONTRACTS                       │
+│  • OpenZeppelin (auditado)                                       │
+│  • ReentrancyGuard                                              │
+│  • Pausable (circuit breaker)                                   │
+│  • AccessControl                                                │
+└─────────────────────────────────────────────────────────────────┘
+</code></pre></p><p><h2>7.2 Sistema de Roles</h2></p><p><h3>Roles On-Chain</h3></p><p><tr><td>Rol</td><td>Hash</td><td>Permisos</td></tr></p><p><tr><td><code>DEFAULT_ADMIN_ROLE</code></td><td><code>0x00</code></td><td>Control total, puede otorgar/revocar otros roles</td></tr>
+<tr><td><code>ADMIN_ROLE</code></td><td><code>keccak256("ADMIN_ROLE")</code></td><td>Acceso al panel admin, configuración</td></tr>
+<tr><td><code>MINTER_ROLE</code></td><td><code>keccak256("MINTER_ROLE")</code></td><td>Crear nuevas propiedades/tokens</td></tr>
+<tr><td><code>PAUSER_ROLE</code></td><td><code>keccak256("PAUSER_ROLE")</code></td><td>Pausar contratos en emergencias</td></tr></p><p><h3>Roles en Aplicación</h3></p><p><tr><td>Rol</td><td>Permisos</td></tr></p><p><tr><td><code>USER</code></td><td>Comprar, vender, reclamar dividendos (requiere KYC)</td></tr>
+<tr><td><code>ADMIN</code></td><td>Todo lo anterior + panel admin + gestión de usuarios</td></tr></p><p><h2>7.3 Autenticación</h2></p><p><h3>JWT Token</h3></p><p><tr><td>Campo</td><td>Valor</td></tr></p><p><tr><td>Algoritmo</td><td>HS256</td></tr>
+<tr><td>Expiración</td><td>7 días</td></tr>
+<tr><td>Almacenamiento</td><td>HTTP-only cookie</td></tr>
+<tr><td>Payload</td><td>userId, walletAddress, role, kycStatus</td></tr></p><p><h3>Secretos Requeridos</h3></p><p><pre><code class="bash"><h1>Mínimo 32 caracteres, generados aleatoriamente</h1>
+JWT_SECRET=your-super-secret-jwt-key-min-32-chars
+SESSION_SECRET=your-super-secret-session-key-min-32-chars
+</code></pre></p><p><h2>7.4 KYC (Know Your Customer)</h2></p><p><h3>Flujo de Verificación</h3></p><p><li>Usuario sube documentos (ID front, ID back, Selfie)</li>
+<li>Documentos se almacenan en Cloudinary (privados, URLs firmadas)</li>
+<li>Admin revisa y aprueba/rechaza</li>
+<li>Aprobación se registra on-chain</li>
+<li>Usuario puede operar</li></p><p><h3>Requerimientos de KYC</h3></p><p><tr><td>Operación</td><td>KYC Requerido</td></tr></p><p><tr><td>Ver propiedades</td><td>No</td></tr>
+<tr><td>Comprar tokens</td><td>Sí</td></tr>
+<tr><td>Vender tokens</td><td>Sí</td></tr>
+<tr><td>Crear listings</td><td>Sí</td></tr>
+<tr><td>Reclamar dividendos</td><td>Sí</td></tr></p><p><h2>7.5 Seguridad de Smart Contracts</h2></p><p><h3>Librerías Utilizadas</h3></p><p><tr><td>Librería</td><td>Propósito</td></tr></p><p><tr><td>OpenZeppelin ERC1155</td><td>Tokens de propiedades</td></tr>
+<tr><td>OpenZeppelin AccessControl</td><td>Gestión de roles</td></tr>
+<tr><td>OpenZeppelin ReentrancyGuard</td><td>Prevención de reentrancy</td></tr>
+<tr><td>OpenZeppelin Pausable</td><td>Circuit breaker</td></tr>
+<tr><td>OpenZeppelin ERC2981</td><td>Royalties estándar</td></tr></p><p><h3>Límites y Validaciones</h3></p><p><tr><td>Parámetro</td><td>Límite</td><td>Razón</td></tr></p><p><tr><td>Royalty fee</td><td>Máx 10% (1000 bp)</td><td>Evitar fees abusivos</td></tr>
+<tr><td>Marketplace fee</td><td>Máx 10%</td><td>Evitar fees abusivos</td></tr>
+<tr><td>Tokens por TX</td><td>Máx 1000</td><td>Límite de gas</td></tr>
+<tr><td>Precio mínimo</td><td>> 0</td><td>Prevenir spam</td></tr></p><p><h2>7.6 Seguridad de API</h2></p><p><h3>Headers de Seguridad</h3></p><p><li>X-Content-Type-Options: nosniff</li>
+<li>X-Frame-Options: DENY</li>
+<li>X-XSS-Protection: 1; mode=block</li></p><p><h3>Rate Limiting</h3></p><p><tr><td>Endpoint</td><td>Límite</td></tr></p><p><tr><td><code>/api/auth/*</code></td><td>10 req/min</td></tr>
+<tr><td><code>/api/kyc/upload</code></td><td>5 req/min</td></tr>
+<tr><td><code>/api/upload</code></td><td>10 req/min</td></tr>
+<tr><td>Otros</td><td>100 req/min</td></tr></p><p><h2>7.7 Gestión de Incidentes</h2></p><p><h3>Niveles de Severidad</h3></p><p><tr><td>Nivel</td><td>Descripción</td><td>Tiempo de Respuesta</td></tr></p><p><tr><td><strong>P0 - Crítico</strong></td><td>Pérdida de fondos, acceso no autorizado</td><td>Inmediato</td></tr>
+<tr><td><strong>P1 - Alto</strong></td><td>Vulnerabilidad explotable</td><td>< 4 horas</td></tr>
+<tr><td><strong>P2 - Medio</strong></td><td>Bug de seguridad no explotado</td><td>< 24 horas</td></tr>
+<tr><td><strong>P3 - Bajo</strong></td><td>Mejora de seguridad</td><td>< 1 semana</td></tr></p><p><h3>Procedimiento de Emergencia</h3></p><p><li>PAUSAR contratos (si aplica)</li>
+<li>EVALUAR el impacto</li>
+<li>CONTENER el problema</li>
+<li>COMUNICAR</li>
+<li>REMEDIAR</li>
+<li>POST-MORTEM</li></p><p><h2>7.8 Controles de Acceso</h2></p><p><h3>Matriz de Permisos</h3></p><p><tr><td>Recurso</td><td>USER</td><td>ADMIN</td><td>DEFAULT_ADMIN</td></tr></p><p><tr><td>Ver propiedades</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>Comprar tokens</td><td>✓*</td><td>✓</td><td>✓</td></tr>
+<tr><td>Vender tokens</td><td>✓*</td><td>✓</td><td>✓</td></tr>
+<tr><td>Crear propiedades</td><td>✗</td><td>✓</td><td>✓</td></tr>
+<tr><td>Aprobar KYC</td><td>✗</td><td>✓</td><td>✓</td></tr>
+<tr><td>Pausar contratos</td><td>✗</td><td>✓**</td><td>✓</td></tr>
+<tr><td>Otorgar roles</td><td>✗</td><td>✗</td><td>✓</td></tr></p><p>*Requiere KYC aprobado
+<strong>Requiere PAUSER_ROLE</p><p><h2>7.9 Resumen de Buenas Prácticas</h2></p><p><li></strong>Secrets en variables de entorno, nunca en código<strong></li>
+<li></strong>HTTPS obligatorio en producción<strong></li>
+<li></strong>JWT con HTTP-only cookies<strong></li>
+<li></strong>Validación server-side de todos los inputs<strong></li>
+<li></strong>Roles on-chain para autorizaciones críticas<strong></li>
+<li></strong>KYC obligatorio para operaciones financieras<strong></li>
+<li></strong>Contratos pausables para emergencias<strong></li>
+<li></strong>Auditoría de acciones admin<strong></li>
+<li></strong>Rate limiting en todos los endpoints<strong></li>
+<li></strong>Dependencias actualizadas y auditadas<strong></li></p><p><div style="page-break-after: always;"></div></p><p><h1>8. Guía de Setup y Deploy</h1></p><p><h2>8.1 Requisitos Previos</h2></p><p><h3>Software Requerido</h3></p><p><tr><td>Software</td><td>Versión Mínima</td><td>Propósito</td></tr></p><p><tr><td>Node.js</td><td>18.x</td><td>Runtime</td></tr>
+<tr><td>npm / yarn</td><td>9.x / 1.x</td><td>Package manager</td></tr>
+<tr><td>PostgreSQL</td><td>15+</td><td>Base de datos</td></tr>
+<tr><td>Docker</td><td>24.x</td><td>Contenedores (opcional)</td></tr>
+<tr><td>Git</td><td>2.x</td><td>Control de versiones</td></tr></p><p><h3>Cuentas de Servicios</h3></p><p><tr><td>Servicio</td><td>URL</td><td>Propósito</td></tr></p><p><tr><td>Alchemy</td><td>https://alchemy.com</td><td>RPC + Webhooks</td></tr>
+<tr><td>Web3Auth</td><td>https://web3auth.io</td><td>Autenticación social</td></tr>
+<tr><td>Cloudinary</td><td>https://cloudinary.com</td><td>Storage de imágenes</td></tr>
+<tr><td>Pinata</td><td>https://pinata.cloud</td><td>IPFS storage</td></tr></p><p><h2>8.2 Setup Local</h2></p><p><h3>Clonar e Instalar</h3></p><p><pre><code class="bash">git clone https://github.com/your-org/tokenbyu.git
+cd tokenbyu
+npm install
+</code></pre></p><p><h3>Configurar Variables de Entorno</h3></p><p><pre><code class="bash">cp .env.example .env
+</code></pre></p><p>Editar <code>.env</code> con valores:</p><p><pre><code class="bash"><h1>APP</h1>
+NEXT_PUBLIC_APP_URL=http://localhost:3000</p><p><h1>DATABASE</h1>
+DATABASE_URL=postgresql://user:password@localhost:5432/tokenbyu</p><p><h1>BLOCKCHAIN</h1>
+NEXT_PUBLIC_CHAIN_ID=80002
+NEXT_PUBLIC_RPC_URL=https://polygon-amoy.g.alchemy.com/v2/YOUR_API_KEY</p><p><h1>AUTH</h1>
+JWT_SECRET=genera-clave-de-min-32-caracteres-aqui
+NEXT_PUBLIC_WEB3AUTH_CLIENT_ID=tu-client-id-de-web3auth
+</code></pre></p><p><h3>Configurar Base de Datos</h3></p><p><pre><code class="bash"><h1>Crear base de datos</h1>
+createdb tokenbyu</p><p><h1>Ejecutar migraciones</h1>
+npx prisma migrate dev</p><p><h1>Sembrar datos iniciales (opcional)</h1>
+npx prisma db seed
+</code></pre></p><p><h3>Iniciar Servidor</h3></p><p><pre><code class="bash">npm run dev
+</code></pre></p><p>Aplicación disponible en: <code>http://localhost:3000</code></p><p><h2>8.3 Variables de Entorno</h2></p><p><h3>Variables Requeridas</h3></p><p><tr><td>Variable</td><td>Descripción</td></tr></p><p><tr><td><code>DATABASE_URL</code></td><td>PostgreSQL connection string</td></tr>
+<tr><td><code>NEXT_PUBLIC_CHAIN_ID</code></td><td>ID de la red blockchain</td></tr>
+<tr><td><code>NEXT_PUBLIC_RPC_URL</code></td><td>URL del RPC</td></tr>
+<tr><td><code>JWT_SECRET</code></td><td>Clave para JWT (min 32 chars)</td></tr>
+<tr><td><code>NEXT_PUBLIC_WEB3AUTH_CLIENT_ID</code></td><td>Client ID de Web3Auth</td></tr></p><p><h3>Variables de Contratos</h3></p><p><tr><td>Variable</td><td>Descripción</td></tr></p><p><tr><td><code>NEXT_PUBLIC_PROPERTY_TOKEN_ADDRESS</code></td><td>Dirección PropertyToken</td></tr>
+<tr><td><code>NEXT_PUBLIC_PROPERTY_MARKETPLACE_ADDRESS</code></td><td>Dirección Marketplace</td></tr>
+<tr><td><code>NEXT_PUBLIC_ROYALTY_DISTRIBUTOR_ADDRESS</code></td><td>Dirección RoyaltyDistributor</td></tr>
+<tr><td><code>NEXT_PUBLIC_PAYMENT_PROCESSOR_ADDRESS</code></td><td>Dirección PaymentProcessor</td></tr></p><p><h3>Variables de Servicios Externos</h3></p><p><tr><td>Variable</td><td>Descripción</td></tr></p><p><tr><td><code>CLOUDINARY_CLOUD_NAME</code></td><td>Nombre de cloud Cloudinary</td></tr>
+<tr><td><code>CLOUDINARY_API_KEY</code></td><td>API Key de Cloudinary</td></tr>
+<tr><td><code>CLOUDINARY_API_SECRET</code></td><td>API Secret de Cloudinary</td></tr>
+<tr><td><code>PINATA_API_KEY</code></td><td>API Key de Pinata</td></tr></p><p><h2>8.4 Deploy de Smart Contracts</h2></p><p><h3>Deploy a Testnet (Amoy)</h3></p><p><pre><code class="bash">npm run deploy:amoy
+</code></pre></p><p><h3>Deploy a Mainnet (Polygon)</h3></p><p><pre><code class="bash">npm run deploy:polygon
+</code></pre></p><p><h3>Verificar Contratos</h3></p><p><pre><code class="bash">npm run verify:polygon
+</code></pre></p><p><h2>8.5 Deploy a Producción</h2></p><p><h3>Vercel (Recomendado)</h3></p><p><li>Conectar repositorio en Vercel</li>
+<li>Configurar variables de entorno</li>
+<li>Configurar build: <code>npm run build</code></li>
+<li>Deploy: <code>vercel --prod</code></li></p><p><h3>Railway</h3></p><p><li>Crear proyecto en Railway</li>
+<li>Agregar PostgreSQL</li>
+<li>Configurar variables</li>
+<li>Deploy automático al push</li></p><p><h2>8.6 Comandos Útiles</h2></p><p><h3>Desarrollo</h3></p><p><pre><code class="bash">npm run dev          # Servidor de desarrollo
+npm test             # Tests
+npm run lint         # Linting
+</code></pre></p><p><h3>Base de Datos</h3></p><p><pre><code class="bash">npx prisma generate       # Generar cliente
+npx prisma migrate dev    # Crear migración
+npx prisma migrate deploy # Aplicar migraciones
+npx prisma studio         # Abrir Prisma Studio
+</code></pre></p><p><h3>Smart Contracts</h3></p><p><pre><code class="bash">npx hardhat compile        # Compilar contratos
+npx hardhat test           # Tests de contratos
+npm run deploy:amoy        # Deploy testnet
+npm run deploy:polygon     # Deploy mainnet
+</code></pre></p><p><h2>8.7 Checklist de Deploy</h2></p><p><h3>Pre-Deploy</h3></p><p><li>[ ] Variables de entorno configuradas</li>
+<li>[ ] Contratos desplegados y verificados</li>
+<li>[ ] Base de datos migrada</li>
+<li>[ ] Tests pasando</li>
+<li>[ ] Build exitoso</li></p><p><h3>Post-Deploy</h3></p><p><li>[ ] <code>/api/health</code> responde OK</li>
+<li>[ ] Login con Web3Auth funciona</li>
+<li>[ ] Admin puede acceder</li>
+<li>[ ] Webhooks configurados</li>
+<li>[ ] SSL/HTTPS configurado</li></p><p><div style="page-break-after: always;"></div></p><p><h1>9. Runbook Operativo</h1></p><p><h2>9.1 Información General</h2></p><p><h3>Componentes del Sistema</h3></p><p><tr><td>Componente</td><td>Tecnología</td><td>Puerto</td></tr></p><p><tr><td>Frontend/API</td><td>Next.js</td><td>3000</td></tr>
+<tr><td>Database</td><td>PostgreSQL</td><td>5432</td></tr>
+<tr><td>Blockchain</td><td>Polygon</td><td>-</td></tr>
+<tr><td>Storage</td><td>Cloudinary</td><td>-</td></tr>
+<tr><td>IPFS</td><td>Pinata</td><td>-</td></tr></p><p><h2>9.2 Health Checks</h2></p><p><h3>Verificación de Servicios</h3></p><p><pre><code class="bash"><h1>Health check de la aplicación</h1>
+curl -s https://your-domain.com/api/health | jq</p><p><h1>Respuesta esperada:</h1>
+<h1>{"status":"healthy","timestamp":"..."}</h1>
+</code></pre></p><p><h3>Verificación de Base de Datos</h3></p><p><pre><code class="bash">npx prisma db execute --stdin <<< "SELECT 1"
+</code></pre></p><p><h2>9.3 Backup y Restore</h2></p><p><h3>Backup Manual</h3></p><p><pre><code class="bash"><h1>Crear backup</h1>
+pg_dump $DATABASE_URL > backup_$(date +%Y%m%d_%H%M%S).sql</p><p><h1>Backup comprimido</h1>
+pg_dump $DATABASE_URL | gzip > backup_$(date +%Y%m%d_%H%M%S).sql.gz
+</code></pre></p><p><h3>Restore</h3></p><p><pre><code class="bash"><h1>Restore desde archivo</h1>
+psql $DATABASE_URL < backup.sql</p><p><h1>Restore desde gzip</h1>
+gunzip -c backup.sql.gz | psql $DATABASE_URL
+</code></pre></p><p><h2>9.4 Procedimientos de Mantenimiento</h2></p><p><h3>Actualización de Aplicación</h3></p><p><pre><code class="bash"><h1>1. Backup</h1>
+pg_dump $DATABASE_URL > pre_update_backup.sql</p><p><h1>2. Pull cambios</h1>
+git pull origin main</p><p><h1>3. Instalar dependencias</h1>
+npm ci</p><p><h1>4. Ejecutar migraciones</h1>
+npx prisma migrate deploy</p><p><h1>5. Build</h1>
+npm run build</p><p><h1>6. Restart</h1>
+pm2 restart tokenbyu</p><p><h1>7. Verificar</h1>
+curl https://your-domain.com/api/health
+</code></pre></p><p><h2>9.5 Monitoreo</h2></p><p><h3>Métricas Clave</h3></p><p><tr><td>Métrica</td><td>Warning</td><td>Critical</td></tr></p><p><tr><td>Response time API</td><td>> 500ms</td><td>> 2000ms</td></tr>
+<tr><td>Error rate</td><td>> 1%</td><td>> 5%</td></tr>
+<tr><td>Database connections</td><td>> 80%</td><td>> 95%</td></tr>
+<tr><td>Memory usage</td><td>> 80%</td><td>> 95%</td></tr></p><p><h2>9.6 Troubleshooting</h2></p><p><h3>Aplicación No Responde</h3></p><p><pre><code class="bash"><h1>Verificar estado</h1>
+pm2 status</p><p><h1>Ver logs</h1>
+pm2 logs tokenbyu --lines 100</p><p><h1>Restart</h1>
+pm2 restart tokenbyu
+</code></pre></p><p><h3>Base de Datos No Conecta</h3></p><p><pre><code class="bash"><h1>Verificar conexión</h1>
+psql $DATABASE_URL -c "SELECT 1"</p><p><h1>Ver logs</h1>
+docker-compose logs db
+</code></pre></p><p><h2>9.7 Procedimientos de Emergencia</h2></p><p><h3>Pausar Contratos</h3></p><p></strong>Cuándo pausar:<strong>
+<li>Vulnerabilidad detectada</li>
+<li>Comportamiento anómalo</li>
+<li>Ataque en progreso</li></p><p><pre><code class="bash">npx hardhat run scripts/pause-all.ts --network polygon
+</code></pre></p><p><h3>Despausar Contratos</h3></p><p><pre><code class="bash">npx hardhat run scripts/unpause-all.ts --network polygon
+</code></pre></p><p><h2>9.8 Tareas Programadas</h2></p><p><h3>Diarias</h3></p><p><tr><td>Hora</td><td>Tarea</td></tr></p><p><tr><td>02:00</td><td>Backup DB</td></tr>
+<tr><td>06:00</td><td>Limpieza logs</td></tr>
+<tr><td>08:00</td><td>Health check</td></tr></p><p><h3>Mensuales</h3></p><p><tr><td>Tarea</td></tr></p><p><tr><td>Rotación de secrets</td></tr>
+<tr><td>Auditoría de accesos</td></tr>
+<tr><td>Actualización de dependencias</td></tr>
+<tr><td>Test de restore</td></tr></p><p><h2>9.9 Rollback</h2></p><p><h3>Rollback de Aplicación</h3></p><p><pre><code class="bash">git checkout COMMIT_HASH
+npm ci
+npm run build
+pm2 restart tokenbyu
+</code></pre></p><p><h3>Rollback de Migración</h3></p><p><pre><code class="bash">psql $DATABASE_URL < pre_migration_backup.sql
+</code></pre></p><p><div style="page-break-after: always;"></div></p><p><h1>10. Release Notes</h1></p><p><h2>Version 0.1.0 (Beta) - December 2024</h2></p><p><h3>Overview</h3></p><p>Primera versión beta de TokenByU, una plataforma de tokenización de bienes raíces que permite la inversión fraccionada en propiedades inmobiliarias a través de tokens ERC1155 en la red Polygon.</p><p><h2>10.1 Alcance Entregado</h2></p><p><h3>Smart Contracts (Blockchain)</h3></p><p><tr><td>Contrato</td><td>Descripción</td><td>Estado</td></tr></p><p><tr><td></strong>PropertyToken.sol<strong></td><td>Tokens ERC1155 con royalties ERC2981</td><td>Desplegado</td></tr>
+<tr><td></strong>PropertyMarketplace.sol<strong></td><td>Marketplace P2P con KYC</td><td>Desplegado</td></tr>
+<tr><td></strong>RoyaltyDistributor.sol<strong></td><td>Distribución de dividendos</td><td>Desplegado</td></tr>
+<tr><td></strong>PaymentProcessor.sol<strong></td><td>Pagos USDT/USDC/MATIC</td><td>Desplegado</td></tr>
+<tr><td></strong>TestFaucet.sol<strong></td><td>Faucet para testnet</td><td>Desplegado</td></tr></p><p><h3>Backend (API)</h3></p><p></strong>51 endpoints REST implementados:<strong></p><p><tr><td>Módulo</td><td>Endpoints</td></tr></p><p><tr><td>Auth</td><td>4</td></tr>
+<tr><td>Users</td><td>7</td></tr>
+<tr><td>Properties</td><td>7</td></tr>
+<tr><td>KYC</td><td>6</td></tr>
+<tr><td>Marketplace</td><td>10</td></tr>
+<tr><td>Dividends</td><td>7</td></tr>
+<tr><td>Admin</td><td>12</td></tr>
+<tr><td>Others</td><td>4</td></tr></p><p><h3>Frontend (UI/UX)</h3></p><p></strong>Secciones principales:<strong>
+<li>Home: Landing page con estadísticas</li>
+<li>Explore: Catálogo de propiedades</li>
+<li>Marketplace: Compra/venta de tokens</li>
+<li>Profile: Portfolio, KYC, transacciones</li>
+<li>Admin Panel: Gestión completa</li></p><p><h3>Testing</h3></p><p><tr><td>Tipo</td><td>Cantidad</td><td>Cobertura</td></tr></p><p><tr><td>Unit Tests</td><td>852</td><td>Hooks: 95.8%, Services: 100%</td></tr>
+<tr><td>Integration Tests</td><td>22</td><td>API Routes</td></tr>
+<tr><td>E2E Tests</td><td>Configurado</td><td>Playwright ready</td></tr></p><p><h2>10.2 Funcionalidades Principales</h2></p><p><h3>Para Usuarios</h3></p><p><li></strong>Autenticación Web3<strong> - Login con wallet o social</li>
+<li></strong>KYC<strong> - Verificación de identidad</li>
+<li></strong>Inversión en Propiedades<strong> - Compra de fracciones</li>
+<li></strong>Marketplace P2P<strong> - Comercio de tokens</li>
+<li></strong>Dividendos<strong> - Reclamo de ganancias</li></p><p><h3>Para Administradores</h3></p><p><li></strong>Dashboard<strong> - Métricas en tiempo real</li>
+<li></strong>Gestión de Propiedades<strong> - CRUD completo</li>
+<li></strong>KYC Management<strong> - Aprobación/rechazo</li>
+<li></strong>Gestión de Contratos<strong> - Pausar, fees, roles</li>
+<li></strong>Distribución de Dividendos<strong> - Crear y ejecutar</li></p><p><h2>10.3 Known Issues</h2></p><p><h3>Alta Prioridad</h3></p><p><tr><td>ID</td><td>Issue</td><td>Workaround</td></tr></p><p><tr><td>KI-001</td><td>Cache de admin expira cada 60s</td><td>Aumentar TTL</td></tr>
+<tr><td>KI-002</td><td>Webhooks duplicados en alta carga</td><td>Implementar idempotency keys</td></tr>
+<tr><td>KI-003</td><td>Upload >5MB puede fallar</td><td>Comprimir imágenes</td></tr></p><p><h3>Media Prioridad</h3></p><p><tr><td>ID</td><td>Issue</td><td>Workaround</td></tr></p><p><tr><td>KI-004</td><td>Estimación de gas imprecisa</td><td>Ajuste manual</td></tr>
+<tr><td>KI-005</td><td>Búsqueda sin full-text</td><td>Usar filtros</td></tr>
+<tr><td>KI-006</td><td>Sin notificaciones email</td><td>Check manual</td></tr></p><p><h2>10.4 Limitaciones Conocidas</h2></p><p><li></strong>Límite de tokens por transacción:<strong> Máximo 1000 tokens</li>
+<li></strong>KYC requerido:<strong> Todas las operaciones financieras</li>
+<li></strong>Royalty máximo:<strong> 10%</li>
+<li></strong>Fee marketplace:<strong> Hasta 10%</li>
+<li></strong>Tokens de pago:<strong> Solo USDT, USDC y MATIC</li></p><p><h2>10.5 Próximos Pasos (Roadmap v0.2.0)</h2></p><p><li>[ ] Notificaciones push y email</li>
+<li>[ ] Multi-idioma completo (EN/ES)</li>
+<li>[ ] Integración con exchanges</li>
+<li>[ ] Governance tokens</li>
+<li>[ ] Mobile app (React Native)</li>
+<li>[ ] Auditoría de seguridad externa</li></p><p>---</p><p></strong>© 2024 TokenByU. Todos los derechos reservados.**
+</p>
+</body>
+</html>

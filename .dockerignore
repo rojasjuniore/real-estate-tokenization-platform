@@ -1,0 +1,61 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js
+.next
+out
+
+# Build
+dist
+build
+
+# Environment files (use docker-compose env instead)
+.env
+.env.local
+.env.development
+.env.production
+*.local
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Testing
+coverage
+.nyc_output
+playwright-report
+test-results
+
+# Hardhat (smart contracts - not needed in app container)
+cache
+artifacts
+typechain-types
+
+# Documentation
+*.md
+docs
+LICENSE
+
+# Debug scripts
+scripts/check-*.ts
+scripts/debug-*.ts
+scripts/decode-*.ts
+scripts/simulate-*.ts

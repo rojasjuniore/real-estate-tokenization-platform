@@ -1,0 +1,269 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Usuario
+model User {
+  id              String    @id @default(cuid())
+  walletAddress   String    @unique
+  email           String?
+  name            String?
+  profileImage    String?
+  role            UserRole  @default(USER)
+  isPropertyAdmin Boolean   @default(false)
+  kycStatus       KYCStatus @default(NONE)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  portfolio     Portfolio[]
+  transactions  Transaction[]
+  kycSubmission KYCSubmission?
+}
+
+// KYC
+model KYCSubmission {
+  id                       String    @id @default(cuid())
+  userId                   String    @unique
+  user                     User      @relation(fields: [userId], references: [id])
+  idFrontUrl               String
+  idBackUrl                String
+  selfieUrl                String
+  status                   KYCStatus @default(PENDING)
+  adminNotes               String?
+  reviewedBy               String?
+  reviewedAt               DateTime?
+  marketplaceTxHash        String?   // Transaction hash for PropertyMarketplace KYC approval
+  paymentProcessorTxHash   String?   // Transaction hash for PaymentProcessor KYC approval
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+}
+
+// Propiedad
+model Property {
+  id                 String           @id @default(cuid())
+  tokenId            BigInt?          @unique // Optional until minted on blockchain (BigInt for large token IDs)
+  name               String
+  description        String
+  location           String
+  mapUrl             String?          // Google Maps embed URL
+  propertyType       PropertyType
+  images             String[]
+  documents          String[]         // PDFs and legal documents URLs
+  metadataUri        String?          // IPFS metadata URI (generated after creation)
+  totalFractions     Int
+  availableFractions Int
+  pricePerFraction   Decimal          @db.Decimal(18, 6)
+  estimatedROI       Decimal          @db.Decimal(5, 2)
+  timeline           InvestmentTimeline @default(SHORT_TERM)
+  status             PropertyStatus   @default(PENDING_REVIEW)
+  // Review data
+  rejectionReason    String?          // Razón de rechazo si fue rechazado
+  reviewedBy         String?          // Wallet del admin que revisó
+  reviewedAt         DateTime?        // Fecha de revisión
+  // Blockchain data
+  mintTxHash         String?          // Transaction hash from createProperty
+  approveTxHash      String?          // Transaction hash from setApprovalForAll
+  listingTxHash      String?          // Transaction hash from createListing
+  mintBlockNumber    Int?             // Block number where mint was confirmed
+  contractAddress    String?          // PropertyToken contract address
+  chainId            Int?             // Chain ID (137 for Polygon, 80001 for Mumbai)
+  mintedAt           DateTime?        // When tokens were minted
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  listings   Listing[]
+  dividends  Dividend[]
+  portfolios Portfolio[]
+}
+
+// Listado en Marketplace
+model Listing {
+  id               String        @id @default(cuid())
+  onChainListingId Int?          @unique // Listing ID from PropertyMarketplace contract
+  propertyId       String
+  property         Property      @relation(fields: [propertyId], references: [id])
+  seller           String
+  buyer            String?
+  amount           Int           // Initial amount listed
+  remainingAmount  Int?          // Remaining amount (updated as sales happen)
+  pricePerToken    Decimal       @db.Decimal(18, 6)
+  paymentToken     String
+  paymentTokenAddress String?    // Contract address of payment token
+  approvalTxHash   String?       // Transaction hash from setApprovalForAll
+  txHash           String?       // Transaction hash from createListing
+  buyTxHash        String?       // Transaction hash from buy
+  status           ListingStatus @default(ACTIVE)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+// Transaccion
+model Transaction {
+  id            String            @id @default(cuid())
+  userId        String
+  user          User              @relation(fields: [userId], references: [id])
+  propertyId    String?
+  type          TransactionType
+  txHash        String            @unique
+  amount        Decimal           @db.Decimal(18, 6)
+  tokenAmount   Int?
+  paymentToken  String
+  status        TransactionStatus @default(PENDING)
+  createdAt     DateTime          @default(now())
+}
+
+// Portfolio del Usuario
+model Portfolio {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+  tokenAmount Int
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, propertyId])
+}
+
+// Dividendo
+model Dividend {
+  id                    String         @id @default(cuid())
+  propertyId            String
+  property              Property       @relation(fields: [propertyId], references: [id])
+  totalAmount           Decimal        @db.Decimal(18, 6)
+  amountPerToken        Decimal        @db.Decimal(18, 6)
+  paymentToken          String
+  period                String
+  onChainDistributionId Int?           // Distribution ID from blockchain contract
+  approvalTxHash        String?        // Token approval transaction hash
+  txHash                String?        // Distribution creation transaction hash
+  status                DividendStatus @default(PENDING)
+  distributedAt         DateTime?
+  createdAt             DateTime       @default(now())
+
+  claims DividendClaim[]
+}
+
+// Claim de Dividendo
+model DividendClaim {
+  id          String    @id @default(cuid())
+  dividendId  String
+  dividend    Dividend  @relation(fields: [dividendId], references: [id])
+  userAddress String
+  amount      Decimal   @db.Decimal(18, 6)
+  claimed     Boolean   @default(false)
+  txHash      String?
+  claimedAt   DateTime?
+}
+
+// Configuracion del Sistema
+model SystemConfig {
+  id                    String   @id @default(cuid())
+  platformName          String   @default("TokenByU")
+  contactEmail          String   @default("")
+  marketplaceCommission Decimal  @default(2.5) @db.Decimal(5, 2)
+  defaultFractions      Int      @default(10000)
+  minInvestment         Int      @default(1)
+  maxInvestment         Int      @default(1000000)
+  treasuryWallet        String   @default("")
+  acceptedTokens        String[] @default(["USDC", "USDT", "MATIC"])
+  kycRequired           Boolean  @default(true)
+  maintenanceMode       Boolean  @default(false)
+  updatedAt             DateTime @updatedAt
+}
+
+// Enums
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum KYCStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PropertyType {
+  RESIDENTIAL
+  COMMERCIAL
+  INDUSTRIAL
+  MIXED
+}
+
+enum PropertyStatus {
+  PENDING_REVIEW  // Esperando revisión del admin
+  APPROVED        // Aprobado, listo para deploy
+  REJECTED        // Rechazado por admin
+  DRAFT           // En proceso de deploy (legacy)
+  ACTIVE          // Activo en marketplace
+  SOLD_OUT        // Vendido completamente
+  PAUSED          // Pausado
+}
+
+enum InvestmentTimeline {
+  SHORT_TERM   // 1-2 years
+  LONG_TERM    // 3-4 years
+}
+
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  CANCELLED
+}
+
+enum TransactionType {
+  BUY
+  SELL
+  DIVIDEND_CLAIM
+  DIVIDEND_DISTRIBUTION
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum DividendStatus {
+  PENDING
+  DISTRIBUTED
+  CANCELLED
+}
+
+// Historial de transacciones de roles en smart contracts
+model RoleTransaction {
+  id              String          @id @default(cuid())
+  targetAddress   String          // Wallet que recibe/pierde el rol
+  executedBy      String          // Wallet del admin que ejecutó
+  action          RoleAction      // GRANT o REVOKE
+  contractName    String          // Nombre del contrato (PropertyToken, PropertyMarketplace)
+  contractAddress String          // Dirección del contrato
+  roleHash        String          // Hash del rol (ADMIN_ROLE)
+  txHash          String          @unique
+  blockNumber     Int?
+  gasUsed         String?
+  status          RoleTransactionStatus @default(SUCCESS)
+  errorMessage    String?
+  createdAt       DateTime        @default(now())
+
+  @@index([targetAddress])
+  @@index([executedBy])
+  @@index([createdAt])
+}
+
+enum RoleAction {
+  GRANT
+  REVOKE
+}
+
+enum RoleTransactionStatus {
+  SUCCESS
+  FAILED
+}
