@@ -46,7 +46,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const provider = new ethers.JsonRpcProvider('https://polygon-rpc.com');
+    const rpcUrl = process.env.BACKEND_RPC_URL || process.env.NEXT_PUBLIC_RPC_URL;
+    if (!rpcUrl) {
+      return NextResponse.json(
+        { success: false, error: { code: 'CONFIG_ERROR', message: 'RPC URL not configured' } },
+        { status: 500 }
+      );
+    }
+    const provider = new ethers.JsonRpcProvider(rpcUrl);
     const results = [];
 
     for (const contractInfo of CONTRACTS) {
@@ -134,7 +141,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const provider = new ethers.JsonRpcProvider('https://polygon-rpc.com');
+    const rpcUrl = process.env.BACKEND_RPC_URL || process.env.NEXT_PUBLIC_RPC_URL;
+    if (!rpcUrl) {
+      return NextResponse.json(
+        { success: false, error: { code: 'CONFIG_ERROR', message: 'RPC URL not configured' } },
+        { status: 500 }
+      );
+    }
+    const provider = new ethers.JsonRpcProvider(rpcUrl);
     const wallet = new ethers.Wallet(privateKey, provider);
 
     const results = [];

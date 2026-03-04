@@ -16,7 +16,7 @@ export const config = createConfig({
     injected(),
   ],
   transports: {
-    [polygon.id]: http(),
+    [polygon.id]: http(process.env.NEXT_PUBLIC_RPC_URL),
   },
   ssr: true,
 });
